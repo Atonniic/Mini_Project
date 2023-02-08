@@ -66,9 +66,25 @@ void GET_value(int name)
     }
 }
 
-void PUT_value(int name, int sensor_status)
+void PUT_sensor(int name, int sensor_status)
 {
     const String url = baseUrl + "update/sensor/" + String(name) + "/" + String(sensor_status);
+    HTTPClient http;
+    http.begin(url);
+    int httpResponseCode = http.PUT("");
+    if (httpResponseCode >= 200 && httpResponseCode < 300)
+    {
+        Serial.print("Done!!");
+    }
+    else
+    {
+        Serial.print("Error code: ");
+        Serial.println(httpResponseCode);
+    }
+}
+
+void PUT_on_off(int name, bool is_on) {
+    const String url = baseUrl + "update/on_off/" + String(name) + "/" + String(is_on);
     HTTPClient http;
     http.begin(url);
     int httpResponseCode = http.PUT("");
@@ -90,14 +106,25 @@ void HTTP(void *param){
         GET_value(1);
         GET_value(2);
         if (bed_mode == 0) {
-            PUT_value(0, ldr);
+            PUT_sensor(0, ldr);
         }
         if (kit_mode == 0) {
-            PUT_value(1, ldr);
+            PUT_sensor(1, ldr);
         }
         if (lou_mode == 0) {
-            PUT_value(2, ldr);
+            PUT_sensor(2, ldr);
         }
+
+        if (bed_mode == 1) {
+            PUT_on_off(0, bed_on);
+        }
+        if (kit_mode == 1) {
+            PUT_on_off(1, kit_on);
+        }
+        if (lou_mode == 1) {
+            PUT_on_off(2, lou_on);
+        }
+        
         vTaskDelay(25/portTICK_PERIOD_MS);
     }
 }
