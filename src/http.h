@@ -2,7 +2,7 @@
 #include <HTTPClient.h>
 #include <ArduinoJson.h>
 
-const String baseUrl = "รอลิ๊ง";
+const String baseUrl = "https://ecourse.cpe.ku.ac.th/exceed12/";
 
 extern int bed_mode; 
 extern int kit_mode;
@@ -20,7 +20,7 @@ extern int ldr;
 
 void Connect_Wifi()
 {
-    WiFi.begin("", "");
+    WiFi.begin("ติ๊งต่าง", "87654321");
     Serial.println("Connecting to WiFi..");
     while (WiFi.status() != WL_CONNECTED)
     {
@@ -34,7 +34,7 @@ void Connect_Wifi()
 void GET_value(int name)
 {
     DynamicJsonDocument doc(2048);
-    const String url = baseUrl + "/getdata/" + String(name);
+    const String url = baseUrl + "getdata/" + String(name);
     HTTPClient http;
     http.begin(url);
     int httpResponseCode = http.GET();
