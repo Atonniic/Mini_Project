@@ -12,9 +12,9 @@ extern bool bed_on;
 extern bool kit_on;
 extern bool lou_on;
 
-extern int bed_brightness ;
-extern int kit_brightness ;
-extern int lou_brightness ;
+extern int bed_brightness;
+extern int kit_brightness;
+extern int lou_brightness;
 
 extern int ldr;
 
@@ -34,7 +34,7 @@ void Connect_Wifi()
 void GET_value()
 {
     DynamicJsonDocument doc(2048);
-    const String url = baseUrl + "posts/1";
+    const String url = baseUrl + "";
     HTTPClient http;
     http.begin(url);
     int httpResponseCode = http.GET();
@@ -45,9 +45,6 @@ void GET_value()
         Serial.println(httpResponseCode);
         String payload = http.getString();
         deserializeJson(doc, payload);
-
-        Serial.println();
-        Serial.println((const char *)doc["title"]);
     }
     else
     {
@@ -56,23 +53,12 @@ void GET_value()
     }
 }
 
-void POST_value(int name, int mode, bool is_on, int brightness, int sensor_status)
+void PUT_value(int name, int sensor_status)
 {
-    String json;
-    DynamicJsonDocument doc(2048);
-    doc["name"] = name; // int
-    doc["mode"] = mode; //int
-    doc["brightness"] = brightness; //int
-    doc["sensor_status"] = sensor_status; //int
-    doc["is_on"] = is_on; //bool 
-    serializeJson(doc, json);
-
-    const String url = baseUrl + "posts";
+    const String url = baseUrl + "update/sensor/" + String(name) + "/" + String(sensor_status);
     HTTPClient http;
     http.begin(url);
-    http.addHeader("Content-Type", "application/json");
-
-    int httpResponseCode = http.POST(json);
+    int httpResponseCode = http.PUT("");
     if (httpResponseCode >= 200 && httpResponseCode < 300)
     {
         Serial.print("Done!!");
@@ -88,9 +74,15 @@ void HTTP(void *param){
     while (1)
     {
         GET_value();
-        POST_value(0, bed_mode, bed_on, bed_brightness, ldr);
-        POST_value(1, kit_mode, kit_on, kit_brightness, ldr);
-        POST_value(2, lou_mode, lou_on, lou_brightness, ldr);
-        vTaskDelay(25 / portTICK_PERIOD_MS);
+        if (bed_mode == 0) {
+            PUT_value(0, ldr);
+        }
+        if (kit_mode == 0) {
+            PUT_value(1, ldr);
+        }
+        if (lou_mode == 0) {
+            PUT_value(2, ldr);
+        }
+        vTaskDelay(25/portTICK_PERIOD_MS);
     }
 }
