@@ -10,7 +10,7 @@ Bounce debouncer = Bounce();
 #define BEDSWITCH 13
 
 #define KIT 26 // room 1
-#define KITSWITCH 0
+#define KITSWITCH 12
 
 #define LOU 25 // room 2
 #define LOUSWITCH 15
@@ -160,6 +160,17 @@ void BTN(void *param) {
     }
 }
 
+/*
+void Mode_control(void *param) {
+    while(1){
+        if (bed_mode == 0 || kit_mode == 0 || lou_mode == 0) {
+            ldr = map(analogRead(LDR),500,4000,0,255);
+            Serial.println("LDR: " + String(ldr));
+        }
+        vTaskDelay(1000/portTICK_PERIOD_MS);
+    }
+}
+*/
 void setup(){
     Serial.begin(115200);
     //Connect_Wifi();
