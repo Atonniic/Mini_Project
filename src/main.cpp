@@ -130,7 +130,7 @@ void Read_LDR(void *param) {
             ldr = map(analogRead(LDR),500,4000,0,255);
             Serial.println("LDR: " + String(ldr));
         }
-        vTaskDelay(1000/portTICK_PERIOD_MS);
+        vTaskDelay(25/portTICK_PERIOD_MS);
     }
 }
 
@@ -178,7 +178,7 @@ void setup(){
     xTaskCreatePinnedToCore(kit_control, "kit_control", 20000, NULL, 1, NULL, 0);
     xTaskCreatePinnedToCore(lou_control, "lou_control", 20000, NULL, 1, NULL, 0);
     xTaskCreatePinnedToCore(BTN, "BTN", 20000, NULL, 1, NULL, 0);
-    //xTaskCreatePinnedToCore(HTTP, "HTTP", 20000, NULL, 1, NULL, 1);
+    xTaskCreatePinnedToCore(HTTP, "HTTP", 20000, NULL, 1, NULL, 1);
 }
 
 void loop(){
