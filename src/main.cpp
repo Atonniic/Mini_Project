@@ -36,14 +36,12 @@ void bed_control(void *param){
     int bed_on_current = 50;
     while(1) {
         if (bed_mode == 0) {
-            if (ldr <= 60) {
-                //ledcWrite(0, 1);
-                digitalWrite(BED, HIGH);
+            if (ldr <= 100) {
+                ledcWrite(0, bed_brightness);
                 bed_on = true;
             }
             else {
-                //ledcWrite(0, 0);
-                digitalWrite(BED, LOW);
+                ledcWrite(0, 0);
                 bed_on = false;
             }
         }
@@ -52,12 +50,10 @@ void bed_control(void *param){
             if (bed_on_current - bed_on_last < -20) {
                 bed_on = !bed_on;
                 if (bed_on) {
-                    //ledcWrite(0, 1);
-                    digitalWrite(BED, HIGH);
+                    ledcWrite(0, bed_brightness);
                 }
                 else {
-                    //ledcWrite(0, 0);
-                    digitalWrite(BED, LOW);
+                    ledcWrite(0, 0);
                 }
             }
             bed_on_last = bed_on_current;
@@ -71,14 +67,12 @@ void kit_control(void *param){
     int kit_on_current = 50;
     while(1) {
         if (kit_mode == 0) {
-            if (ldr <= 60) {
-                //ledcWrite(0, 1);
-                digitalWrite(KIT, HIGH);
+            if (ldr <= 100) {
+                ledcWrite(1, kit_brightness);
                 kit_on = true;
             }
             else {
-                //ledcWrite(0, 0);
-                digitalWrite(KIT, LOW);
+                ledcWrite(1, 0);
                 kit_on = false;
             }
         }
@@ -87,12 +81,10 @@ void kit_control(void *param){
             if (kit_on_current - kit_on_last < -20) {
                 kit_on = !kit_on;
                 if (kit_on) {
-                    //ledcWrite(0, 1);
-                    digitalWrite(KIT, HIGH);
+                    ledcWrite(1, kit_brightness);
                 }
                 else {
-                    //ledcWrite(0, 0);
-                    digitalWrite(KIT, LOW);
+                    ledcWrite(1, 0);
                 }
             }
             kit_on_last = kit_on_current;
@@ -106,14 +98,12 @@ void lou_control(void *param){
     int lou_on_current = 50;
     while(1) {
         if (lou_mode == 0) {
-            if (ldr <= 60) {
-                //ledcWrite(0, 1);
-                digitalWrite(LOU, HIGH);
+            if (ldr <= 100) {
+                ledcWrite(2, lou_brightness);
                 bed_on = true;
             }
             else {
-                //ledcWrite(0, 0);
-                digitalWrite(LOU, LOW);
+                ledcWrite(2, 0);
                 bed_on = false;
             }
         }
@@ -122,12 +112,10 @@ void lou_control(void *param){
             if (lou_on_current - lou_on_last < -20) {
                 lou_on = !lou_on;
                 if (lou_on) {
-                    //ledcWrite(0, 1);
-                    digitalWrite(LOU, HIGH);
+                    ledcWrite(2, lou_brightness);
                 }
                 else {
-                    //ledcWrite(0, 0);
-                    digitalWrite(LOU, LOW);
+                    ledcWrite(2, 0);
                 }
             }
             lou_on_last = lou_on_current;
@@ -154,19 +142,19 @@ void BTN(void *param) {
             bed_mode = 0;
             kit_mode = 0;
             lou_mode = 0;
-            Serial.println("Mode: 0");
+            Serial.println("Mode: AUTO");
         }
         else if (debouncer.fell() && bed_mode == 0) {
             bed_mode = 1;
             kit_mode = 1;
             lou_mode = 1;
-            Serial.println("Mode: 1");
+            Serial.println("Mode: HARDWARE");
         }
         else if (debouncer.fell() && bed_mode == 1) {
             bed_mode = 2;
             kit_mode = 2;
             lou_mode = 2;
-            Serial.println("Mode: 2");
+            Serial.println("Mode: SOFTWARE");
         }
         vTaskDelay(25/portTICK_PERIOD_MS);
     }
@@ -175,17 +163,12 @@ void BTN(void *param) {
 void setup(){
     Serial.begin(115200);
     //Connect_Wifi();
-    /*
     ledcSetup(0, 5000, 8);
     ledcAttachPin(BED, 0);
     ledcSetup(1, 5000, 8);
     ledcAttachPin(KIT, 1);
     ledcSetup(2, 5000, 8);
     ledcAttachPin(LOU, 2);
-    */
-    pinMode(BED, OUTPUT);
-    pinMode(KIT, OUTPUT);
-    pinMode(LOU, OUTPUT);
     //simulator switch
     debouncer.attach(BUTTON, INPUT_PULLUP);
     debouncer.interval(25);
