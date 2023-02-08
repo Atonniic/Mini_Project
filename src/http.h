@@ -48,15 +48,15 @@ void GET_value(int name)
         if (name == 0) {
             bed_mode = doc["mode"].as<int>();
             bed_on = doc["is_on"].as<bool>();
-            bed_brightness = doc["brightness"].as<int>() * 33;
+            bed_brightness = doc["brightness"].as<int>() * 85;
         } else if (name == 1) {
             kit_mode = doc["mode"].as<int>();
             kit_on = doc["is_on"].as<bool>();
-            kit_brightness = doc["brightness"].as<int>() * 33;
+            kit_brightness = doc["brightness"].as<int>() * 85;
         } else if (name == 2) {
             lou_mode = doc["mode"].as<int>();
             lou_on = doc["is_on"].as<bool>();
-            lou_brightness = doc["brightness"].as<int>() * 33;
+            lou_brightness = doc["brightness"].as<int>() * 85;
         }
     }
     else
