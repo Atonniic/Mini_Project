@@ -31,10 +31,10 @@ void Connect_Wifi()
     Serial.println(WiFi.localIP());
 }
 
-void GET_value()
+void GET_value(int name)
 {
     DynamicJsonDocument doc(2048);
-    const String url = baseUrl + "";
+    const String url = baseUrl + "/getdata/" + String(name);
     HTTPClient http;
     http.begin(url);
     int httpResponseCode = http.GET();
@@ -45,6 +45,19 @@ void GET_value()
         Serial.println(httpResponseCode);
         String payload = http.getString();
         deserializeJson(doc, payload);
+        if (name == 0) {
+            bed_mode = doc["mode"].as<int>();
+            bed_on = doc["is_on"].as<bool>();
+            bed_brightness = doc["brightness"].as<int>();
+        } else if (name == 1) {
+            kit_mode = doc["mode"].as<int>();
+            kit_on = doc["is_on"].as<bool>();
+            kit_brightness = doc["brightness"].as<int>();
+        } else if (name == 2) {
+            lou_mode = doc["mode"].as<int>();
+            lou_on = doc["is_on"].as<bool>();
+            lou_brightness = doc["brightness"].as<int>();
+        }
     }
     else
     {
@@ -73,7 +86,9 @@ void PUT_value(int name, int sensor_status)
 void HTTP(void *param){
     while (1)
     {
-        GET_value();
+        GET_value(0);
+        GET_value(1);
+        GET_value(2);
         if (bed_mode == 0) {
             PUT_value(0, ldr);
         }
