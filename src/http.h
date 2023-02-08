@@ -4,19 +4,19 @@
 
 const String baseUrl = "รอลิ๊ง";
 
-extern int mode_kit; //mode 0-2
-extern int mode_bed; //mode 0-2
-extern int mode_lou; //mode 0-2
+extern int bed_mode; 
+extern int kit_mode;
+extern int lou_mode;
 
-extern bool light_kit_on; //is_on true/false
-extern bool light_bed_on; //is_on true/false
-extern bool light_lou_on; //is_on true/false
+extern bool bed_on;
+extern bool kit_on;
+extern bool lou_on;
 
-extern int light_kit_value; //brightness 0-3
-extern int light_bed_value; //brightness 0-3
-extern int light_lou_value; //brightness 0-3
+extern int bed_brightness ;
+extern int kit_brightness ;
+extern int lou_brightness ;
 
-extern int ldr; //sensor_status 0-255
+extern int ldr;
 
 void Connect_Wifi()
 {
@@ -88,9 +88,9 @@ void HTTP(void *param){
     while (1)
     {
         GET_value();
-        POST_value(0, mode_bed, light_bed_on, light_bed_value, ldr);
-        POST_value(1, mode_kit, light_kit_on, light_kit_value, ldr);
-        POST_value(2, mode_lou, light_lou_on, light_lou_value, ldr);
+        POST_value(0, bed_mode, bed_on, bed_brightness, ldr);
+        POST_value(1, kit_mode, kit_on, kit_brightness, ldr);
+        POST_value(2, lou_mode, lou_on, lou_brightness, ldr);
         vTaskDelay(25 / portTICK_PERIOD_MS);
     }
 }

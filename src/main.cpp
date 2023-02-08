@@ -26,69 +26,98 @@ int lou_brightness = 255;
 
 int ldr = 255;
 
-void manual_hw_control(void *param) {
+void control(void *param) {
     while (true) {
-        if (light_kit_on) {
-            ledcWrite(0, light_kit_value);
-        } else {
+        //Bed
+        if (bed_on) {
+            ledcWrite(0, bed_brightness);
+        } 
+        else {
             ledcWrite(0, 0);
         }
-        if (light_bed_on) {
-            ledcWrite(1, light_bed_value);
-        } else {
+        //Kitchen
+        if (kit_on) {
+            ledcWrite(1, kit_brightness);
+        } 
+        else {
             ledcWrite(1, 0);
         }
-        if (light_lou_on) {
-            ledcWrite(2, light_lou_value);
-        } else {
+        //lounge
+        if (lou_on) {
+            ledcWrite(2, lou_brightness);
+        } 
+        else {
             ledcWrite(2, 0);
         }
     }
 }
 
-void detect_on_off(void *param) {
-    int kit_last = 50;
-    int kit_current = 50;
-    int bed_last = 50;
-    int bed_current = 50;
-    int lou_last = 50;
-    int lou_current = 50;
-    while (true) {
-        kit_current = touchRead(KITSWITCH);
-        bed_current = touchRead(BEDSWITCH);
-        lou_current = touchRead(LOUSWITCH);
-        if (kit_current - kit_last < -20) {
-            light_kit_on = !light_kit_on;
-        }
-        if (bed_current - bed_last < -20) {
-            light_bed_on = !light_bed_on;
-        }
-        if (lou_current - lou_last < -20) {
-            light_lou_on = !light_lou_on;
-        }
-        kit_last = kit_current;
-        bed_last = bed_current;
-        lou_last = lou_current;
-        vTaskDelay(25/portTICK_PERIOD_MS);
-    }
-}
-
 void bed_control(void *param){
+    int bed_on_last = 50;
+    int bed_on_current = 50;
     while(1) {
         if (bed_mode == 0) {
             Serial.println("Mode: bed auto");
             if (ldr <= 60) {
                 ledcWrite(0, bed_brightness);
-                Serial.println("Bed: on");
                 bed_on = true;
             }
         }
         else if (bed_mode == 1) {
-            
+            Serial.println("Mode: HW");
+            bed_on_current = touchRead(BEDSWITCH);
+            if (bed_on_current - bed_on_last < -20) {
+                bed_on = !bed_on;
+            }
+            bed_on_last = bed_on_current;
         }
-        else if (bed_mode == 2) {
-        
+        vTaskDelay(25/portTICK_PERIOD_MS);
+    }
+}
+
+void kit_control(void *param){
+    int kit_on_last = 50;
+    int kit_on_current = 50;
+    while(1) {
+        if (kit_mode == 0) {
+            Serial.println("Mode: kit auto");
+            if (ldr <= 60) {
+                ledcWrite(0, kit_brightness);
+                kit_on = true;
+            }
         }
+        else if (kit_mode == 1) {
+            Serial.println("Mode: HW");
+            kit_on_current = touchRead(KITSWITCH);
+            if (kit_on_current - kit_on_last < -20) {
+                kit_on = !kit_on;
+            }
+            kit_on_last = kit_on_current;
+        }
+        vTaskDelay(25/portTICK_PERIOD_MS);
+    }
+}
+
+void lou_control(void *param){
+    int lou_on_last = 50;
+    int lou_on_current = 50;
+    while(1) {
+        if (lou_mode == 0) {
+            Serial.println("Mode: lou auto");
+            if (ldr <= 60) {
+                ledcWrite(0, bed_brightness);
+                bed_on = true;
+            }
+        }
+        else if (lou_mode == 1) {
+            Serial.println("Mode: HW");
+            lou_on_current = touchRead(LOUSWITCH);
+            if (lou_on_current - lou_on_last < -20) {
+                lou_on = !lou_on;
+            }
+            lou_on_last = lou_on_current;
+        }
+        vTaskDelay(25/portTICK_PERIOD_MS);
     }
 }
 
@@ -111,10 +140,13 @@ void setup(){
     ledcAttachPin(KIT, 1);
     ledcSetup(2, 5000, 8);
     ledcAttachPin(LOU, 2);
-    xTaskCreatePinnedToCore(Read_LDR, "Read_LDR", 10000, NULL, 1, NULL, 0); 
-    xTaskCreatePinnedToCore(HTTP, "HTTP", 10000, NULL, 1, NULL, 1);
-    xTaskCreatePinnedToCore(detect_on_off, "detect_on_off", 20000, NULL, 1, NULL, 1);
-    xTaskCreatePinnedToCore(manual_hw_control, "control", 20000, NULL, 1, NULL, 0);
+
+    xTaskCreatePinnedToCore(control, "control", 10000, NULL, 1, NULL, 0);
+    xTaskCreatePinnedToCore(Read_LDR, "detect_on_off", 20000, NULL, 1, NULL, 0); 
+    xTaskCreatePinnedToCore(bed_control, "bed_control", 10000, NULL, 1, NULL, 0);
+    xTaskCreatePinnedToCore(kit_control, "kit_control", 10000, NULL, 1, NULL, 1);
+    xTaskCreatePinnedToCore(lou_control, "lou_control", 10000, NULL, 1, NULL, 1);
+    xTaskCreatePinnedToCore(HTTP, "HTTP", 20000, NULL, 1, NULL, 1);
 }
 
 void loop(){
